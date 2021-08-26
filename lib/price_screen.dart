@@ -10,8 +10,6 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  CoinData coinData = CoinData();
-  String rateValue = '?';
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -50,18 +48,24 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  Future<void> setRate() async {
-    double rate = await coinData.getCoinData();
-    setState(() {
-      rateValue = rate.toInt().toString();
-    });
-    super.initState();
+  String bitcoinValue = '?';
+
+  void getData() async {
+    try {
+      double data = await CoinData().getCoinData();
+      //13. We can't await in a setState(). So you have to separate it out into two steps.
+      setState(() {
+        bitcoinValue = data.toStringAsFixed(0);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
   void initState() {
-    setRate();
     super.initState();
+    getData();
   }
 
   @override
@@ -85,7 +89,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $rateValue USD',
+                  '1 BTC = $bitcoinValue USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,

@@ -32,7 +32,7 @@ const List<String> cryptoList = [
 ];
 
 class CoinData {
-  Future<double> getCoinData({currency = 'USD'}) async {
+  Future getCoinData({currency = 'USD'}) async {
     final response = await http.get(
       Uri.parse('https://rest.coinapi.io/v1/exchangerate/BTC/$currency'),
       headers: <String, String>{
@@ -41,14 +41,12 @@ class CoinData {
     );
 
     if (response.statusCode == 200) {
-      var responseBody = jsonDecode(response.body);
-      print(responseBody);
-      print(responseBody['rate']);
-      return responseBody['rate'];
+      var decodedData = jsonDecode(response.body);
+      var lastPrice = decodedData['rate'];
+      return lastPrice;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load album');
+      print(response.statusCode);
+      throw Exception('Problem with the get request');
     }
   }
 }
