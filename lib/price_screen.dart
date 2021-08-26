@@ -12,7 +12,7 @@ class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
 
   DropdownButton<String> androidDropdown() {
-    List<DropdownMenuItem> dropdownItems = [];
+    List<DropdownMenuItem<String>> dropdownItems = [];
     for (String currency in currenciesList) {
       dropdownItems.add(
         DropdownMenuItem(
@@ -46,14 +46,6 @@ class _PriceScreenState extends State<PriceScreen> {
       },
       children: pickerItems,
     );
-  }
-
-  Widget getPicker() {
-    if (Platform.isIOS) {
-      return iOSPicker();
-    } else if (Platform.isAndroid) {
-      return androidDropdown();
-    }
   }
 
   @override
@@ -92,7 +84,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: getPicker(),
+            child: Platform.isAndroid ? androidDropdown() : iOSPicker(),
           ),
         ],
       ),
