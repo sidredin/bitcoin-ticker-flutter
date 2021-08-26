@@ -43,6 +43,7 @@ class CoinData {
     if (response.statusCode == 200) {
       var decodedData = jsonDecode(response.body);
       var lastPrice = decodedData['rate'];
+      print(lastPrice);
       return lastPrice;
     } else {
       print(response.statusCode);

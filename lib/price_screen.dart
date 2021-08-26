@@ -27,6 +27,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (theValue) {
         setState(() {
           selectedCurrency = theValue;
+          getData(currency: selectedCurrency);
         });
       },
     );
@@ -42,7 +43,10 @@ class _PriceScreenState extends State<PriceScreen> {
     return CupertinoPicker(
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        setState(() {
+          selectedCurrency = currenciesList[selectedIndex];
+          getData(currency: selectedCurrency);
+        });
       },
       children: pickerItems,
     );
@@ -50,10 +54,9 @@ class _PriceScreenState extends State<PriceScreen> {
 
   String bitcoinValue = '?';
 
-  void getData() async {
+  void getData({currency = 'USD'}) async {
     try {
-      double data = await CoinData().getCoinData();
-      //13. We can't await in a setState(). So you have to separate it out into two steps.
+      double data = await CoinData().getCoinData(currency: currency);
       setState(() {
         bitcoinValue = data.toStringAsFixed(0);
       });
@@ -89,7 +92,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $bitcoinValue USD',
+                  '1 BTC = $bitcoinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
