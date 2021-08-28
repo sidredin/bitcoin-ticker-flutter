@@ -52,27 +52,21 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  String bitcoinValue;
-  String ethereumValue;
-  String litecoinValue;
+  //value had to be updated into a Map to store the values of all three cryptocurrencies.
+  Map<String, String> coinValues = {};
+  //7: Figure out a way of displaying a '?' on screen while we're waiting for the price data to come back. First we have to create a variable to keep track of when we're waiting on the request to complete.
+  bool isWaiting = false;
 
   void getData() async {
+    //7: Second, we set it to true when we initiate the request for prices.
+    isWaiting = true;
     try {
+      //6: Update this method to receive a Map containing the crypto:price key value pairs.
+      var data = await CoinData().getCoinData(selectedCurrency);
+      //7. Third, as soon the above line of code completes, we now have the data and no longer need to wait. So we can set isWaiting to false.
+      isWaiting = false;
       setState(() {
-        bitcoinValue = '?';
-        ethereumValue = '?';
-        litecoinValue = '?';
-      });
-      double bitcoinData = await CoinData()
-          .getCoinData(currencyBase: 'BTC', currencyQuote: selectedCurrency);
-      double ethereumData = await CoinData()
-          .getCoinData(currencyBase: 'ETH', currencyQuote: selectedCurrency);
-      double litecoinData = await CoinData()
-          .getCoinData(currencyBase: 'LTC', currencyQuote: selectedCurrency);
-      setState(() {
-        bitcoinValue = bitcoinData.toStringAsFixed(0);
-        ethereumValue = ethereumData.toStringAsFixed(0);
-        litecoinValue = litecoinData.toStringAsFixed(0);
+        coinValues = data;
       });
     } catch (e) {
       print(e);
@@ -85,6 +79,23 @@ class _PriceScreenState extends State<PriceScreen> {
     getData();
   }
 
+   Column makeCards() {
+   List<CryptoCard> cryptoCards = [];
+   for (String crypto in cryptoList) {
+     cryptoCards.add(
+       CryptoCard(
+         cryptoCurrency: crypto,
+         selectedCurrency: selectedCurrency,
+         value: isWaiting ? '?' : coinValues[crypto],
+       ),
+     );
+   }
+   return Column(
+     crossAxisAlignment: CrossAxisAlignment.stretch,
+     children: cryptoCards,
+   );
+ }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,69 +106,7 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitcoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 ETH = $ethereumValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 328.0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 LTC = $litecoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          makeCards(),
           Container(
             height: 150.0,
             alignment: Alignment.center,
@@ -170,3 +119,42 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
+
+class CryptoCard extends StatelessWidget {
+  const CryptoCard({
+    this.value,
+    this.selectedCurrency,
+    this.cryptoCurrency,
+  });
+
+  final String value;
+  final String selectedCurrency;
+  final String cryptoCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoCurrency = $value $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
