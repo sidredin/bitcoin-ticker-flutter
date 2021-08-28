@@ -52,13 +52,27 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  String bitcoinValue = '?';
+  String bitcoinValue;
+  String ethereumValue;
+  String litecoinValue;
 
-  void getData({currency = 'USD'}) async {
+  void getData() async {
     try {
-      double data = await CoinData().getCoinData(currency: selectedCurrency);
       setState(() {
-        bitcoinValue = data.toStringAsFixed(0);
+        bitcoinValue = '?';
+        ethereumValue = '?';
+        litecoinValue = '?';
+      });
+      double bitcoinData = await CoinData()
+          .getCoinData(currencyBase: 'BTC', currencyQuote: selectedCurrency);
+      double ethereumData = await CoinData()
+          .getCoinData(currencyBase: 'ETH', currencyQuote: selectedCurrency);
+      double litecoinData = await CoinData()
+          .getCoinData(currencyBase: 'LTC', currencyQuote: selectedCurrency);
+      setState(() {
+        bitcoinValue = bitcoinData.toStringAsFixed(0);
+        ethereumValue = ethereumData.toStringAsFixed(0);
+        litecoinValue = litecoinData.toStringAsFixed(0);
       });
     } catch (e) {
       print(e);
@@ -93,6 +107,48 @@ class _PriceScreenState extends State<PriceScreen> {
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
                   '1 BTC = $bitcoinValue $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 ETH = $ethereumValue $selectedCurrency',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 328.0),
+            child: Card(
+              color: Colors.lightBlueAccent,
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                child: Text(
+                  '1 LTC = $litecoinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
