@@ -49,7 +49,7 @@ class CoinData {
     //   print(response.statusCode);
     //   throw Exception('Problem with the get request');
     // }
-    Future.delayed(
+    return Future.delayed(
       const Duration(seconds: 2),
       () => 1.1,
     );
